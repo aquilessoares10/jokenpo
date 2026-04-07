@@ -1,0 +1,318 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  .hero { text-align: center; padding: 2rem 1rem 1rem; width: 100%; }
+  .hero h1 { font-size: 26px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.5px; }
+  .hero p { font-size: 14px; color: var(--color-text-secondary); margin-top: 6px; }
+
+  .paw-row { display: flex; gap: 8px; justify-content: center; margin: 1rem 0; }
+  .paw { font-size: 20px; opacity: 0.5; }
+
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 100%; max-width: 480px; margin: 0.5rem auto; }
+
+  .player-block { display: flex; flex-direction: column; gap: 1rem; }
+  .player-input-row { display: flex; flex-direction: column; gap: 6px; }
+  .player-input-row label { font-size: 13px; color: var(--color-text-secondary); font-weight: 500; }
+  .player-input-row input { width: 100%; padding: 10px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 15px; outline: none; }
+  .player-input-row input:focus { border-color: var(--color-border-primary); }
+
+  .btn-primary { margin-top: 1rem; width: 100%; padding: 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-text-primary); color: var(--color-background-primary); font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary { padding: 10px 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: background 0.12s; }
+  .btn-secondary:hover { background: var(--color-background-secondary); }
+
+  .section-label { font-size: 12px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; text-align: center; }
+
+  .moves-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+  .move-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 8px; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .move-btn:hover { border-color: var(--color-border-primary); background: var(--color-background-secondary); }
+  .move-btn.selected { border: 1.5px solid var(--color-text-primary); background: var(--color-background-secondary); }
+  .move-btn svg { width: 48px; height: 48px; }
+  .move-btn span { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+
+  .turn-label { font-size: 15px; color: var(--color-text-primary); font-weight: 500; margin: 1rem 0 0.5rem; text-align: center; }
+  .turn-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; text-align: center; }
+
+  .arena { display: flex; align-items: center; justify-content: space-around; width: 100%; max-width: 480px; padding: 1.5rem 1rem; }
+  .arena-player { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .arena-name { font-size: 13px; color: var(--color-text-secondary); }
+  .arena-animal { width: 80px; height: 80px; }
+  .arena-vs { font-size: 20px; font-weight: 500; color: var(--color-text-secondary); }
+  .arena-score { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+
+  .result-card { text-align: center; padding: 2rem 1.5rem; }
+  .result-emoji { font-size: 48px; margin-bottom: 12px; }
+  .result-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .result-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+  .result-moves { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+  .result-move-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .result-move-item span { font-size: 12px; color: var(--color-text-secondary); }
+  .result-btns { display: flex; gap: 10px; justify-content: center; }
+
+  .scoreboard { display: flex; justify-content: center; gap: 2rem; width: 100%; max-width: 480px; padding: 0.75rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0.5rem; }
+  .score-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .score-name { font-size: 12px; color: var(--color-text-secondary); }
+  .score-val { font-size: 24px; font-weight: 500; color: var(--color-text-primary); }
+  .score-sep { font-size: 18px; color: var(--color-text-secondary); align-self: center; }
+
+  .rules-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .rules-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--color-text-primary); }
+  .rules-list li svg { width: 28px; height: 28px; flex-shrink: 0; }
+  .rules-arrow { font-size: 14px; color: var(--color-text-secondary); margin: 0 4px; }
+
+  .waiting-msg { font-size: 13px; color: var(--color-text-secondary); background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 16px; margin-bottom: 1rem; }
+</style>
+
+<div id="s-names" class="screen active" style="padding: 1rem;">
+  <div class="hero">
+    <div style="font-size: 36px; margin-bottom: 8px;">🐾</div>
+    <h1>Jokenpô Animal</h1>
+    <p>Pedra · Papel · Tesoura — com estilo selvagem</p>
+  </div>
+  <div class="card">
+    <div class="section-label">Quem vai jogar?</div>
+    <div class="player-block">
+      <div class="player-input-row">
+        <label>🐺 Jogador 1</label>
+        <input id="inp1" type="text" placeholder="Seu nome..." maxlength="20" />
+      </div>
+      <div class="player-input-row">
+        <label>🦊 Jogador 2</label>
+        <input id="inp2" type="text" placeholder="Seu nome..." maxlength="20" />
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startGame()">Entrar na arena →</button>
+    <div style="text-align:center; margin-top: 1rem;">
+      <button class="btn-secondary" onclick="showRules()">Ver as regras</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-rules" class="screen" style="padding: 1rem;">
+  <div class="hero">
+    <h1>Regras do jogo</h1>
+    <p>Como os animais se enfrentam</p>
+  </div>
+  <div class="card">
+    <ul class="rules-list">
+      <li>
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#D3D1C7"/><text x="24" y="30" text-anchor="middle" font-size="22">🪨</text></svg>
+        <span><b>Pedra</b><span class="rules-arrow">→</span>vence a tesoura</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="8" fill="#9FE1CB"/><text x="24" y="30" text-anchor="middle" font-size="22">📄</text></svg>
+        <span><b>Papel</b><span class="rules-arrow">→</span>vence a pedra</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 48 48"><polygon points="24,4 44,44 4,44" fill="#F5C4B3"/><text x="24" y="36" text-anchor="middle" font-size="22">✂️</text></svg>
+        <span><b>Tesoura</b><span class="rules-arrow">→</span>vence o papel</span>
+      </li>
+    </ul>
+    <button class="btn-primary" style="margin-top: 1.5rem;" onclick="goBack()">← Voltar</button>
+  </div>
+</div>
+
+<div id="s-play" class="screen" style="padding: 1rem; width: 100%;">
+  <div class="scoreboard">
+    <div class="score-item">
+      <span class="score-name" id="sb-name1">—</span>
+      <span class="score-val" id="sb-score1">0</span>
+    </div>
+    <span class="score-sep">×</span>
+    <div class="score-item">
+      <span class="score-name" id="sb-name2">—</span>
+      <span class="score-val" id="sb-score2">0</span>
+    </div>
+  </div>
+
+  <div class="turn-label" id="turn-label">Vez de ...</div>
+  <div class="turn-sub" id="turn-sub">Escolha sua jogada (o outro jogador não vai ver)</div>
+  <div class="waiting-msg" id="waiting-msg" style="display:none;"></div>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="section-label" id="move-section-label">Escolha sua jogada</div>
+    <div class="moves-grid" id="moves-grid">
+      <button class="move-btn" onclick="selectMove('pedra')">
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#D3D1C7"/><circle cx="19" cy="20" r="3" fill="#888780"/><circle cx="29" cy="20" r="3" fill="#888780"/><path d="M17 30 Q24 36 31 30" stroke="#888780" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <span>Pedra 🐻</span>
+      </button>
+      <button class="move-btn" onclick="selectMove('papel')">
+        <svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="6" fill="#9FE1CB"/><line x1="15" y1="18" x2="33" y2="18" stroke="#0F6E56" stroke-width="2.5" stroke-linecap="round"/><line x1="15" y1="24" x2="33" y2="24" stroke="#0F6E56" stroke-width="2.5" stroke-linecap="round"/><line x1="15" y1="30" x2="26" y2="30" stroke="#0F6E56" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>Papel 🦦</span>
+      </button>
+      <button class="move-btn" onclick="selectMove('tesoura')">
+        <svg viewBox="0 0 48 48"><circle cx="17" cy="14" r="7" fill="#F5C4B3" stroke="#D85A30" stroke-width="1.5"/><circle cx="31" cy="14" r="7" fill="#F5C4B3" stroke="#D85A30" stroke-width="1.5"/><line x1="22" y1="18" x2="37" y2="38" stroke="#D85A30" stroke-width="2.5" stroke-linecap="round"/><line x1="26" y1="18" x2="11" y2="38" stroke="#D85A30" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>Tesoura 🦅</span>
+      </button>
+    </div>
+    <button class="btn-primary" id="confirm-btn" style="display:none;" onclick="confirmMove()">Confirmar jogada</button>
+  </div>
+</div>
+
+<div id="s-result" class="screen" style="padding: 1rem;">
+  <div class="card result-card" style="max-width: 480px;">
+    <div class="result-emoji" id="res-emoji">🏆</div>
+    <div class="result-title" id="res-title">Resultado</div>
+    <div class="result-sub" id="res-sub"></div>
+    <div class="result-moves" id="res-moves"></div>
+    <div class="result-btns">
+      <button class="btn-secondary" onclick="playAgain()">Jogar de novo</button>
+      <button class="btn-secondary" onclick="newGame()">Novo jogo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let p1 = '', p2 = '', score1 = 0, score2 = 0;
+  let move1 = null, move2 = null;
+  let currentTurn = 1;
+
+  const animalEmoji = { pedra: '🐻', papel: '🦦', tesoura: '🦅' };
+  const moveEmoji = { pedra: '🪨', papel: '📄', tesoura: '✂️' };
+  const wins = { pedra: 'tesoura', papel: 'pedra', tesoura: 'papel' };
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showRules() { showScreen('s-rules'); }
+  function goBack() { showScreen('s-names'); }
+
+  function startGame() {
+    const v1 = document.getElementById('inp1').value.trim();
+    const v2 = document.getElementById('inp2').value.trim();
+    if (!v1 || !v2) {
+      alert('Por favor, informe o nome dos dois jogadores!');
+      return;
+    }
+    if (v1.toLowerCase() === v2.toLowerCase()) {
+      alert('Os jogadores precisam ter nomes diferentes!');
+      return;
+    }
+    p1 = v1; p2 = v2;
+    score1 = 0; score2 = 0;
+    move1 = null; move2 = null;
+    currentTurn = 1;
+    updateScoreboard();
+    setupTurn();
+    showScreen('s-play');
+  }
+
+  function updateScoreboard() {
+    document.getElementById('sb-name1').textContent = p1;
+    document.getElementById('sb-name2').textContent = p2;
+    document.getElementById('sb-score1').textContent = score1;
+    document.getElementById('sb-score2').textContent = score2;
+  }
+
+  function setupTurn() {
+    const name = currentTurn === 1 ? p1 : p2;
+    document.getElementById('turn-label').textContent = `Vez de ${name}`;
+    document.getElementById('turn-sub').textContent = 'Escolha sua jogada em segredo';
+    document.getElementById('waiting-msg').style.display = 'none';
+    document.getElementById('move-section-label').textContent = 'Escolha sua jogada';
+    document.getElementById('confirm-btn').style.display = 'none';
+    document.querySelectorAll('.move-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.move-btn').forEach(b => b.disabled = false);
+  }
+
+  let selectedMove = null;
+
+  function selectMove(m) {
+    selectedMove = m;
+    document.querySelectorAll('.move-btn').forEach(b => b.classList.remove('selected'));
+    const btns = document.querySelectorAll('.move-btn');
+    const idx = ['pedra','papel','tesoura'].indexOf(m);
+    btns[idx].classList.add('selected');
+    document.getElementById('confirm-btn').style.display = 'block';
+  }
+
+  function confirmMove() {
+    if (!selectedMove) return;
+    if (currentTurn === 1) {
+      move1 = selectedMove;
+      currentTurn = 2;
+      selectedMove = null;
+      const waitMsg = document.getElementById('waiting-msg');
+      waitMsg.style.display = 'block';
+      waitMsg.textContent = `✅ ${p1} escolheu. Agora é a vez de ${p2}!`;
+      setupTurnFor2();
+    } else {
+      move2 = selectedMove;
+      selectedMove = null;
+      showResult();
+    }
+  }
+
+  function setupTurnFor2() {
+    document.getElementById('turn-label').textContent = `Vez de ${p2}`;
+    document.getElementById('turn-sub').textContent = 'Escolha sua jogada em segredo';
+    document.getElementById('move-section-label').textContent = 'Escolha sua jogada';
+    document.getElementById('confirm-btn').style.display = 'none';
+    document.querySelectorAll('.move-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.move-btn').forEach(b => b.disabled = false);
+  }
+
+  function showResult() {
+    let title, sub, emoji;
+
+    if (move1 === move2) {
+      emoji = '🤝';
+      title = 'Empate!';
+      sub = `Ambos escolheram ${move1}. Está tudo igual!`;
+    } else if (wins[move1] === move2) {
+      score1++;
+      emoji = '🏆';
+      title = `${p1} venceu!`;
+      sub = `${capitalize(move1)} ${animalEmoji[move1]} derrota ${move2} ${animalEmoji[move2]}`;
+    } else {
+      score2++;
+      emoji = '🏆';
+      title = `${p2} venceu!`;
+      sub = `${capitalize(move2)} ${animalEmoji[move2]} derrota ${move1} ${animalEmoji[move1]}`;
+    }
+
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-title').textContent = title;
+    document.getElementById('res-sub').textContent = sub;
+    document.getElementById('res-moves').innerHTML = `
+      <div class="result-move-item">
+        <span style="font-size:32px">${moveEmoji[move1]}</span>
+        <span>${p1}</span>
+        <span style="font-weight:500;color:var(--color-text-primary)">${capitalize(move1)}</span>
+      </div>
+      <div style="font-size:18px;color:var(--color-text-secondary);align-self:center">vs</div>
+      <div class="result-move-item">
+        <span style="font-size:32px">${moveEmoji[move2]}</span>
+        <span>${p2}</span>
+        <span style="font-weight:500;color:var(--color-text-primary)">${capitalize(move2)}</span>
+      </div>
+    `;
+
+    updateScoreboard();
+    showScreen('s-result');
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function playAgain() {
+    move1 = null; move2 = null;
+    currentTurn = 1;
+    setupTurn();
+    showScreen('s-play');
+  }
+
+  function newGame() {
+    score1 = 0; score2 = 0;
+    move1 = null; move2 = null;
+    currentTurn = 1;
+    document.getElementById('inp1').value = '';
+    document.getElementById('inp2').value = '';
+    showScreen('s-names');
+  }
+</script>
